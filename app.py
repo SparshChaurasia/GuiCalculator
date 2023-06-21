@@ -1,4 +1,5 @@
 import tkinter as tk
+from math import sqrt
 from tkinter import messagebox
 
 
@@ -13,106 +14,224 @@ class Calculator(tk.Tk):
 
         self.memory: str
         self.text = tk.StringVar()  # Varible to hold the text on the screen
+        self.last_operation = tk.StringVar()
 
-        self.geometry("200x175")
+        self.geometry("180x295")
         self.title("Calculator")
 
-        # GUI component that contains all buttons on the left
-        self.menu = tk.Frame(self)
-        self.menu.pack(side=tk.LEFT)
+        self.top = tk.Frame(self)
+        self.top.grid(row=0, sticky="E")
 
-        # Creating buttons on the menu component
-        self.btn1 = tk.Button(
-            self.menu,
-            text="History",
-            height=2,
-            width=5,
-            command=Calculator.show_history,
-        )
-        self.btn2 = tk.Button(
-            self.menu, text="M+", height=2, width=5, command=self.add_memory
-        )
-        self.btn3 = tk.Button(
-            self.menu, text="M-", height=2, width=5, command=self.clear_memory
-        )
-        self.btn4 = tk.Button(
-            self.menu, text="MRC", height=2, width=5, command=self.recall_memory
-        )
-
-        # Displaying the buttons on the window using the grid geometry manager
-        self.btn1.grid(row=0)
-        self.btn2.grid(row=1)
-        self.btn3.grid(row=2)
-        self.btn4.grid(row=3)
-
+        self.textarea1 = tk.Label(self, textvariable=self.last_operation)
+        self.textarea1.grid(row=1, sticky="EW")
         # Main textarea to display all the text on the screen
         self.textarea = tk.Label(self, textvariable=self.text, bg="white")
-        self.textarea.pack(fill="both", expand=True)
+        self.textarea.grid(row=2, sticky="EW")
+
+        # GUI component that contains all menu buttons
+        self.menu = tk.Frame(self)
+        self.menu.grid(row=3)
 
         # GUI element to hold all the calculator buttons
         self.button_frame = tk.Frame(self)
-        self.button_frame.pack()
+        self.button_frame.grid(row=4)
+
+        # Creating buttons on the menu component
+        self.history = tk.Button(
+            self.top,
+            text="History",
+            height=1,
+            width=5,
+            command=Calculator.show_history,
+        )
+        self.memory_add = tk.Button(
+            self.top, text="M+", height=1, width=5, command=self.add_memory
+        )
+        self.memory_subtract = tk.Button(
+            self.top, text="M-", height=1, width=5, command=self.clear_memory
+        )
+        self.memory_recall = tk.Button(
+            self.top, text="MRC", height=1, width=5, command=self.recall_memory
+        )
+        self.button_alc = tk.Button(
+            self.menu,
+            text="AC",
+            command=lambda: self.text.set(""),
+            height=1,
+            width=5,
+        )
+        self.button_del = tk.Button(
+            self.menu,
+            text="Del",
+            command=lambda: self.text.set(self.text.get()[:-1]),
+            height=1,
+            width=5,
+        )
+        self.button_pow = tk.Button(
+            self.menu,
+            text="pow",
+            command=lambda: self.update("**"),
+            height=1,
+            width=5,
+        )
+        self.button_sqrt = tk.Button(
+            self.menu,
+            text="√",
+            command=lambda: self.update("sqrt("),
+            height=1,
+            width=5,
+        )
+        # Displaying the buttons on the window using the grid geometry manager
+        self.memory_add.grid(column=0, row=0)
+        self.memory_subtract.grid(column=1, row=0)
+        self.memory_recall.grid(column=2, row=0)
+        self.history.grid(column=3, row=0)
+
+        self.button_pow.grid(column=0, row=0)
+        self.button_sqrt.grid(column=1, row=0)
+        self.button_alc.grid(column=2, row=0)
+        self.button_del.grid(column=3, row=0)
 
         # Creating all the buttons for numbers and utility
         self.button1 = tk.Button(
-            self.button_frame, text="1", command=lambda: self.update("1"), padx=10
+            self.button_frame,
+            text="1",
+            command=lambda: self.update("1"),
+            height=2,
+            width=5,
         )
         self.button2 = tk.Button(
-            self.button_frame, text="2", command=lambda: self.update("2"), padx=10
+            self.button_frame,
+            text="2",
+            command=lambda: self.update("2"),
+            height=2,
+            width=5,
         )
         self.button3 = tk.Button(
-            self.button_frame, text="3", command=lambda: self.update("3"), padx=10
+            self.button_frame,
+            text="3",
+            command=lambda: self.update("3"),
+            height=2,
+            width=5,
         )
         self.button4 = tk.Button(
-            self.button_frame, text="4", command=lambda: self.update("4"), padx=10
+            self.button_frame,
+            text="4",
+            command=lambda: self.update("4"),
+            height=2,
+            width=5,
         )
         self.button5 = tk.Button(
-            self.button_frame, text="5", command=lambda: self.update("5"), padx=10
+            self.button_frame,
+            text="5",
+            command=lambda: self.update("5"),
+            height=2,
+            width=5,
         )
         self.button6 = tk.Button(
-            self.button_frame, text="6", command=lambda: self.update("6"), padx=10
+            self.button_frame,
+            text="6",
+            command=lambda: self.update("6"),
+            height=2,
+            width=5,
         )
         self.button7 = tk.Button(
-            self.button_frame, text="7", command=lambda: self.update("7"), padx=10
+            self.button_frame,
+            text="7",
+            command=lambda: self.update("7"),
+            height=2,
+            width=5,
         )
         self.button8 = tk.Button(
-            self.button_frame, text="8", command=lambda: self.update("8"), padx=10
+            self.button_frame,
+            text="8",
+            command=lambda: self.update("8"),
+            height=2,
+            width=5,
         )
         self.button9 = tk.Button(
-            self.button_frame, text="9", command=lambda: self.update("9"), padx=10
+            self.button_frame,
+            text="9",
+            command=lambda: self.update("9"),
+            height=2,
+            width=5,
         )
         self.button0 = tk.Button(
-            self.button_frame, text="0", command=lambda: self.update("0"), padx=25
-        )
-        self.button_alc = tk.Button(
-            self.button_frame, text="AC", command=lambda: self.text.set(""), padx=5
-        )
-        self.button_del = tk.Button(
             self.button_frame,
-            text="Del",
-            command=lambda: self.text.set(self.text.get()[:-1]),
-            padx=3,
+            text="0",
+            command=lambda: self.update("0"),
+            height=2,
+            width=5,
+        )
+        self.button00 = tk.Button(
+            self.button_frame,
+            text="00",
+            command=lambda: self.update("00"),
+            height=2,
+            width=5,
+        )
+        self.bracket_open = tk.Button(
+            self.button_frame,
+            text="(",
+            command=lambda: self.update("("),
+            height=2,
+            width=5,
+        )
+        self.bracket_close = tk.Button(
+            self.button_frame,
+            text=")",
+            command=lambda: self.update(")"),
+            height=2,
+            width=5,
         )
         self.button_mod = tk.Button(
-            self.button_frame, text="%", command=lambda: self.update("%"), padx=10
+            self.button_frame,
+            text="%",
+            command=lambda: self.update("%"),
+            height=2,
+            width=5,
         )
         self.button_add = tk.Button(
-            self.button_frame, text="+", command=lambda: self.update("+"), padx=10
+            self.button_frame,
+            text="+",
+            command=lambda: self.update("+"),
+            height=2,
+            width=5,
         )
         self.button_sub = tk.Button(
-            self.button_frame, text="-", command=lambda: self.update("-"), padx=10
+            self.button_frame,
+            text="-",
+            command=lambda: self.update("-"),
+            height=2,
+            width=5,
         )
         self.button_mul = tk.Button(
-            self.button_frame, text="*", command=lambda: self.update("*"), padx=10
+            self.button_frame,
+            text="*",
+            command=lambda: self.update("*"),
+            height=2,
+            width=5,
         )
         self.button_div = tk.Button(
-            self.button_frame, text="/", command=lambda: self.update("/"), padx=10
+            self.button_frame,
+            text="/",
+            command=lambda: self.update("/"),
+            height=2,
+            width=5,
         )
         self.button_dec = tk.Button(
-            self.button_frame, text=".", command=lambda: self.update("."), padx=10
+            self.button_frame,
+            text=".",
+            command=lambda: self.update("."),
+            height=2,
+            width=5,
         )
         self.button_res = tk.Button(
-            self.button_frame, text="=", command=lambda: self.result(), padx=10
+            self.button_frame,
+            text="=",
+            command=lambda: self.result(),
+            height=2,
+            width=5,
         )
 
         # Displaying the buttons on the window using the grid geometry manager
@@ -125,9 +244,10 @@ class Calculator(tk.Tk):
         self.button7.grid(column=0, row=3)
         self.button8.grid(column=1, row=3)
         self.button9.grid(column=2, row=3)
-        self.button0.grid(column=0, row=4, columnspan=2)
-        self.button_alc.grid(column=0, row=0)
-        self.button_del.grid(column=1, row=0)
+        self.button0.grid(column=0, row=4)
+        self.button00.grid(column=1, row=4)
+        self.bracket_open.grid(column=0, row=0)
+        self.bracket_close.grid(column=1, row=0)
         self.button_mod.grid(column=2, row=0)
         self.button_add.grid(column=3, row=0)
         self.button_sub.grid(column=3, row=1)
@@ -136,6 +256,7 @@ class Calculator(tk.Tk):
         self.button_dec.grid(column=2, row=4)
         self.button_res.grid(column=3, row=4)
 
+    # Function to update the textbox on button press
     def update(self, string):
         _text = self.text.get() + string
         self.text.set(_text)
@@ -186,6 +307,7 @@ class Calculator(tk.Tk):
         try:
             output = eval(_text)
             self.text.set(output)
+            self.last_operation.set(_text)
             Calculator.add_to_history(_text, output)
         except NameError:
             messagebox.showwarning("Error", "Invalid syntax")
