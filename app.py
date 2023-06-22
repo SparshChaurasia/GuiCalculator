@@ -3,6 +3,27 @@ from math import sqrt
 from tkinter import messagebox
 
 
+class WriteToFile:
+    @staticmethod
+    def show_history():
+        """Create a toplevel window and show the text in the data text file"""
+        win = tk.Toplevel()
+        win.geometry("100x100")
+        with open("./data.txt", "r") as file:
+            file_text = "".join(file.readlines())
+
+        label = tk.Label(win, text=file_text)
+        label.pack()
+        win.mainloop()
+
+    @staticmethod
+    def add_history(operation, result):
+        """Add an entry of a opertion in the data text file"""
+        with open("./data.txt", "r+") as file:
+            line = len(file.readlines())
+            file.write(f"{line+1}) {operation} = {result}\n")
+
+
 class Calculator(tk.Tk):
     """
     Class to group the functionality of a calculator
@@ -12,7 +33,7 @@ class Calculator(tk.Tk):
         # Creates an instance of a new GUI window
         super().__init__()
 
-        self.memory: str
+        self.memory = ""
         self.text = tk.StringVar()  # Varible to hold the text on the screen
         self.last_operation = tk.StringVar()
 
@@ -45,13 +66,13 @@ class Calculator(tk.Tk):
             self.top, text="M+", height=2, width=5, command=self.add_memory
         )
         self.memory_subtract = tk.Button(
-            self.top, text="M-", height=2, width=5, command=self.clear_memory
+            self.top, text="M-", height=2, width=5, command=self.subtract_memory
         )
         self.memory_recall = tk.Button(
-            self.top, text="MR", height=2, width=5, command=self.clear_memory
+            self.top, text="MR", height=2, width=5, command=self.recall_memory
         )
         self.memory_recall_clear = tk.Button(
-            self.top, text="MRC", height=2, width=5, command=self.recall_memory
+            self.top, text="MRC", height=2, width=5, command=self.recall_clear_memory
         )
         self.button_ce = tk.Button(
             self.top,
@@ -65,12 +86,12 @@ class Calculator(tk.Tk):
             text="History",
             height=1,
             width=5,
-            command=Calculator.show_history,
+            command=WriteToFile.show_history,
         )
         self.button_alc = tk.Button(
             self.menu,
             text="AC",
-            command=lambda: self.text.set(""),
+            command=self.clear_all,
             height=1,
             width=5,
         )
@@ -83,7 +104,7 @@ class Calculator(tk.Tk):
         )
         self.button_pow = tk.Button(
             self.menu,
-            text="pow",
+            text="xʸ",
             command=lambda: self.update("**"),
             height=1,
             width=5,
@@ -274,8 +295,14 @@ class Calculator(tk.Tk):
 
     # Function to update the textbox on button press
     def update(self, string):
-        _text = self.text.get() + string
+        _text = self.text.get() + str(string)
         self.text.set(_text)
+
+    # Function for AC button
+    def clear_all(self):
+        self.text.set("")
+        self.last_operation.set("")
+        self.clear_memory()
 
     # Functions to use the memory
     def add_memory(self):
@@ -284,37 +311,33 @@ class Calculator(tk.Tk):
         :return: None
         """
 
-        self.memory = self.text.get()
+        self.memory = eval(f"{self.memory} + {eval(self.text.get())}")
+
+    def subtract_memory(self):
+        """
+        Subtact from the memory
+        :return: None
+        """
+
+        self.memory = eval(f"{self.memory} - {eval(self.text.get())}")
 
     def clear_memory(self):
         """Clears the memory"""
 
-        self.memory = None
+        self.memory = ""
 
     def recall_memory(self):
         """Insert the memory value in the textbox"""
 
-        _memory = self.memory if self.memory else ""
+        _memory = self.memory
         self.update(_memory)
 
-    @staticmethod
-    def show_history():
-        """Create a toplevel window and show the text in the data text file"""
-        win = tk.Toplevel()
-        win.geometry("100x100")
-        with open("./data.txt", "r") as file:
-            file_text = "".join(file.readlines())
+    def recall_clear_memory(self):
+        """Insert the memory value in the textbox and clear the mamory"""
 
-        label = tk.Label(win, text=file_text)
-        label.pack()
-        win.mainloop()
-
-    @staticmethod
-    def add_to_history(operation, result):
-        """Add an entry of a opertion in the data text file"""
-        with open("./data.txt", "r+") as file:
-            line = len(file.readlines())
-            file.write(f"{line+1}) {operation} = {result}\n")
+        _memory = self.memory
+        self.update(_memory)
+        self.memory = ""
 
     def result(self):
         """Evaulate the expression and show a message if there are any errors"""
@@ -324,7 +347,7 @@ class Calculator(tk.Tk):
             output = eval(_text)
             self.text.set(output)
             self.last_operation.set(_text + "=")
-            Calculator.add_to_history(_text, output)
+            WriteToFile.add_history(_text, output)
         except NameError:
             messagebox.showwarning("Error", "Invalid syntax")
         except ZeroDivisionError:
