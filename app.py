@@ -16,42 +16,56 @@ class Calculator(tk.Tk):
         self.text = tk.StringVar()  # Varible to hold the text on the screen
         self.last_operation = tk.StringVar()
 
-        self.geometry("180x295")
+        self.geometry("225x273")
         self.title("Calculator")
 
         self.top = tk.Frame(self)
-        self.top.grid(row=0, sticky="E")
+        self.top.grid(row=3, column=0, sticky="E")
 
-        self.textarea1 = tk.Label(self, textvariable=self.last_operation)
-        self.textarea1.grid(row=1, sticky="EW")
+        self.textarea1 = tk.Label(
+            self, textvariable=self.last_operation, justify=tk.RIGHT
+        )
+        self.textarea1.grid(row=0, columnspan=2, sticky="EW")
         # Main textarea to display all the text on the screen
-        self.textarea = tk.Label(self, textvariable=self.text, bg="white")
-        self.textarea.grid(row=2, sticky="EW")
+        self.textarea = tk.Label(
+            self, textvariable=self.text, bg="white", justify=tk.RIGHT
+        )
+        self.textarea.grid(row=1, columnspan=2, sticky="EW")
 
         # GUI component that contains all menu buttons
         self.menu = tk.Frame(self)
-        self.menu.grid(row=3)
+        self.menu.grid(row=2, columnspan=2)
 
         # GUI element to hold all the calculator buttons
         self.button_frame = tk.Frame(self)
-        self.button_frame.grid(row=4)
+        self.button_frame.grid(row=3, column=1)
 
         # Creating buttons on the menu component
-        self.history = tk.Button(
+        self.memory_add = tk.Button(
+            self.top, text="M+", height=2, width=5, command=self.add_memory
+        )
+        self.memory_subtract = tk.Button(
+            self.top, text="M-", height=2, width=5, command=self.clear_memory
+        )
+        self.memory_recall = tk.Button(
+            self.top, text="MR", height=2, width=5, command=self.clear_memory
+        )
+        self.memory_recall_clear = tk.Button(
+            self.top, text="MRC", height=2, width=5, command=self.recall_memory
+        )
+        self.button_ce = tk.Button(
             self.top,
+            text="CE",
+            command=lambda: self.text.set(""),
+            height=2,
+            width=5,
+        )
+        self.history = tk.Button(
+            self.menu,
             text="History",
             height=1,
             width=5,
             command=Calculator.show_history,
-        )
-        self.memory_add = tk.Button(
-            self.top, text="M+", height=1, width=5, command=self.add_memory
-        )
-        self.memory_subtract = tk.Button(
-            self.top, text="M-", height=1, width=5, command=self.clear_memory
-        )
-        self.memory_recall = tk.Button(
-            self.top, text="MRC", height=1, width=5, command=self.recall_memory
         )
         self.button_alc = tk.Button(
             self.menu,
@@ -82,15 +96,17 @@ class Calculator(tk.Tk):
             width=5,
         )
         # Displaying the buttons on the window using the grid geometry manager
-        self.memory_add.grid(column=0, row=0)
-        self.memory_subtract.grid(column=1, row=0)
-        self.memory_recall.grid(column=2, row=0)
-        self.history.grid(column=3, row=0)
+        self.memory_recall.grid(column=0, row=0)
+        self.memory_recall_clear.grid(column=0, row=1)
+        self.memory_subtract.grid(column=0, row=2)
+        self.memory_add.grid(column=0, row=3)
+        self.button_ce.grid(column=0, row=4)
 
-        self.button_pow.grid(column=0, row=0)
-        self.button_sqrt.grid(column=1, row=0)
-        self.button_alc.grid(column=2, row=0)
-        self.button_del.grid(column=3, row=0)
+        self.history.grid(column=0, row=0)
+        self.button_pow.grid(column=1, row=0)
+        self.button_sqrt.grid(column=2, row=0)
+        self.button_alc.grid(column=3, row=0)
+        self.button_del.grid(column=4, row=0)
 
         # Creating all the buttons for numbers and utility
         self.button1 = tk.Button(
@@ -307,7 +323,7 @@ class Calculator(tk.Tk):
         try:
             output = eval(_text)
             self.text.set(output)
-            self.last_operation.set(_text)
+            self.last_operation.set(_text + "=")
             Calculator.add_to_history(_text, output)
         except NameError:
             messagebox.showwarning("Error", "Invalid syntax")
