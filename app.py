@@ -1,6 +1,5 @@
 import tkinter as tk
 from math import sqrt
-from tkinter import messagebox
 
 
 class WriteToFile:
@@ -34,6 +33,7 @@ class Calculator(tk.Tk):
         super().__init__()
 
         self.memory = ""
+        self.error = False
         self.text = tk.StringVar()  # Varible to hold the text on the screen
         self.last_operation = tk.StringVar()
 
@@ -295,6 +295,9 @@ class Calculator(tk.Tk):
 
     # Function to update the textbox on button press
     def update(self, string):
+        if self.error:
+            self.text.set("")
+            self.error = False
         _text = self.text.get() + str(string)
         self.text.set(_text)
 
@@ -348,12 +351,15 @@ class Calculator(tk.Tk):
             self.text.set(output)
             self.last_operation.set(_text + "=")
             WriteToFile.add_history(_text, output)
-        except NameError:
-            messagebox.showwarning("Error", "Invalid syntax")
+        except NameError and SyntaxError:
+            self.error = True  # Set global error flag to true
+            self.text.set("Invalid syntax")
         except ZeroDivisionError:
-            messagebox.showwarning("Error", "Could not divide by zero")
-        except SyntaxError as e:
-            messagebox.showwarning("Error", "Invalid syntax")
+            self.error = True
+            self.text.set("Could not divide by zero")
+        except OverflowError:
+            self.error = True
+            self.text.set("Result too large")
 
 
 if __name__ == "__main__":
