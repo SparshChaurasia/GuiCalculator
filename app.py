@@ -32,26 +32,37 @@ class Calculator(tk.Tk):
         # Creates an instance of a new GUI window
         super().__init__()
 
+        self.resizable(False, False)
+
         self.memory = ""
         self.error = False
         self.text = tk.StringVar()  # Varible to hold the text on the screen
         self.last_operation = tk.StringVar()
 
-        self.geometry("225x273")
+        self.geometry("227x295")
         self.title("Calculator")
 
         self.top = tk.Frame(self)
-        self.top.grid(row=3, column=0, sticky="E")
+        self.top.grid(row=3, column=0)
 
         self.textarea1 = tk.Label(
-            self, textvariable=self.last_operation, justify=tk.RIGHT
+            self,
+            textvariable=self.last_operation,
+            font=("Source Code Pro", 12),
+            width=22,
+            anchor="e",
         )
-        self.textarea1.grid(row=0, columnspan=2, sticky="EW")
+        self.textarea1.grid(row=0, columnspan=2)
         # Main textarea to display all the text on the screen
         self.textarea = tk.Label(
-            self, textvariable=self.text, bg="white", justify=tk.RIGHT
+            self,
+            textvariable=self.text,
+            bg="white",
+            font=("Source Code Pro", 20),
+            width=14,
+            anchor="e",
         )
-        self.textarea.grid(row=1, columnspan=2, sticky="EW")
+        self.textarea.grid(row=1, columnspan=2)
 
         # GUI component that contains all menu buttons
         self.menu = tk.Frame(self)
@@ -353,13 +364,13 @@ class Calculator(tk.Tk):
             WriteToFile.add_history(_text, output)
         except NameError and SyntaxError:
             self.error = True  # Set global error flag to true
-            self.text.set("Invalid syntax")
+            self.last_operation.set("Invalid syntax")
         except ZeroDivisionError:
             self.error = True
-            self.text.set("Could not divide by zero")
+            self.last_operation.set("Cannot divide by zero")
         except OverflowError:
             self.error = True
-            self.text.set("Result too large")
+            self.last_operation.set("Result too large")
 
 
 if __name__ == "__main__":
