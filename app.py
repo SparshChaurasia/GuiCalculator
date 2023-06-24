@@ -4,23 +4,35 @@ from math import sqrt
 
 class WriteToFile:
     @staticmethod
-    def show_history():
-        """Create a toplevel window and show the text in the data text file"""
-        win = tk.Toplevel()
-        win.geometry("100x100")
-        with open("./data.txt", "r") as file:
-            file_text = "".join(file.readlines())
+    def show_history(root):
+        """Create a window and show the text in the data text file"""
 
-        label = tk.Label(win, text=file_text)
-        label.pack()
-        win.mainloop()
+        def close_panel():
+            label.destroy()
+            close_btn.destroy()
+
+        with open("./data.txt", "r") as file:
+            file_text = file.readlines()[-10:]
+            _text = "\n".join(file_text)
+
+        label = tk.Label(
+            root,
+            text=_text,
+            width=20,
+            height=20,
+            font=("Source Code Pro", 10),
+        )
+        close_btn = tk.Button(root, command=close_panel, text="x", width=2, height=1)
+
+        label.place(x=0, y=0)
+        close_btn.place(x=0, y=0)
 
     @staticmethod
     def add_history(operation, result):
         """Add an entry of a opertion in the data text file"""
         with open("./data.txt", "r+") as file:
-            line = len(file.readlines())
-            file.write(f"{line+1}) {operation} = {result}\n")
+            file.readlines()
+            file.write(f"{operation} = {result}\n")
 
 
 class Calculator(tk.Tk):
@@ -97,7 +109,7 @@ class Calculator(tk.Tk):
             text="History",
             height=1,
             width=5,
-            command=WriteToFile.show_history,
+            command=lambda: WriteToFile.show_history(self),
         )
         self.button_alc = tk.Button(
             self.menu,
