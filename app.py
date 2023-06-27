@@ -1,5 +1,6 @@
 import tkinter as tk
 from math import sqrt
+import csv
 
 
 class WriteToFile:
@@ -30,8 +31,7 @@ class WriteToFile:
     @staticmethod
     def add_history(operation, result):
         """Add an entry of a opertion in the data text file"""
-        with open("./data.txt", "r+") as file:
-            file.readlines()
+        with open("./data.txt", "a") as file:
             file.write(f"{operation} = {result}\n")
 
 
