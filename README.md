@@ -13,6 +13,6 @@ This runtime is required to run the file
 #### 2. Run the main.py file
 
 ## Preview
-![img not found](images/img1.PNG)
-![img not found](images/img2.PNG)
-![img not found](images/img3.PNG)
+![img not found](images/img1.png)
+![img not found](images/img2.png)
+![img not found](images/img3.png)
